@@ -77,10 +77,10 @@ c1.metric("Referidos (total)", fmt(r1["referidos"], "{:,.0f}"),
           else f"{(r1['referidos'] / r0['referidos'] - 1) * 100:+.1f}% vs {a0}")
 c2.metric("Fidelización (prom.)", fmt(r1["fidelizacion"], "{:.1f}%"),
           delta(r1["fidelizacion"], r0.get("fidelizacion"), "{:+.1f} pp"))
-c3.metric("Margen bruto (prom.)", fmt(r1["margen"], "{:.1f}%"),
+c3.metric("Margen bruto (prom.)", fmt(r1["margen"], "{:.1f}$"),
           delta(r1["margen"], r0.get("margen"), "{:+.1f} pp"))
 c4.metric("NPS (prom.)", fmt(r1["nps"], "{:.0f}"),
-          delta(r1["nps"], r0.get("nps"), "{:+.0f} pts"))
+          delta(r1["nps"], r0.get("nps"), "{:+.0f} %"))
 
 # ---------------------------------------------------------------- gráficos
 agg = (f.groupby(["anio", col_periodo], as_index=False)
@@ -112,7 +112,7 @@ g1.plotly_chart(grafico("referidos", "Referidos", barras=True), use_container_wi
 g2.plotly_chart(grafico("fidelizacion", "Fidelización (%)", sufijo="%"),
                 use_container_width=True)
 g3, g4 = st.columns(2)
-g3.plotly_chart(grafico("margen", "Margen bruto (%)", sufijo="%"), use_container_width=True)
+g3.plotly_chart(grafico("margen", "Margen bruto ($)", sufijo="$"), use_container_width=True)
 g4.plotly_chart(grafico("nps", "NPS"), use_container_width=True)
 
 st.caption(f"Por {granularidad.lower()}: los referidos se suman; fidelización, margen bruto "
