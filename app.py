@@ -10,61 +10,62 @@ st.set_page_config(page_title="Dashboard de ventas 2025 vs 2026", layout="wide")
 
 # ---------------------------------------------------------------- sidebar
 st.sidebar.header("Filtros")
+with st.sidebar.expander("Importar archivos"):
+    with st.expander("Ventas Liquidos"):
+        archivo = st.file_uploader(
+            "Sube tus datos (CSV/Excel: fecha, producto, ventas y, opcional, transacciones y comb)",
+            type=["csv", "xlsx"])
 
-archivo = st.sidebar.file_uploader(
-    "Sube tus datos (CSV/Excel: fecha, producto, ventas y, opcional, transacciones y comb)",
-    type=["csv", "xlsx"])
+        if archivo:
+            dayfirst = st.checkbox("Fechas con día primero (dd/mm/aaaa)", value=True)
+            df = preparar(adaptar(cargar_archivo(archivo), con_extras=True, ct=st), dayfirst=dayfirst)
+        else:
+            df = preparar(datos_demo())
 
-if archivo:
-    dayfirst = st.sidebar.checkbox("Fechas con día primero (dd/mm/aaaa)", value=True)
-    df = preparar(adaptar(cargar_archivo(archivo), con_extras=True), dayfirst=dayfirst)
-else:
-    df = preparar(datos_demo())
+        if df.empty:
+            st.error("No quedaron datos válidos tras leer el archivo. Revisa las columnas de fecha y ventas elegidas, o el formato de fecha.")
+            st.stop()
 
-if df.empty:
-    st.error("No quedaron datos válidos tras leer el archivo. Revisa las columnas de fecha y ventas elegidas, o el formato de fecha.")
-    st.stop()
+    with st.expander("Presupuesto mensual por producto"):
+        if archivo:
+            arch_pres = st.file_uploader(
+                "Sube el presupuesto (CSV/Excel: producto, mes, presupuesto y, opcional, año)",
+                type=["csv", "xlsx"], key="arch_pres")
+            pres = adaptar_presupuesto(cargar_archivo(arch_pres), dayfirst) if arch_pres else None
+        else:
+            st.caption("Usando presupuesto de ejemplo.")
+            pres = presupuesto_demo(df)
 
-with st.sidebar.expander("Presupuesto mensual por producto", expanded=True):
-    if archivo:
-        arch_pres = st.file_uploader(
-            "Sube el presupuesto (CSV/Excel: producto, mes, presupuesto y, opcional, año)",
-            type=["csv", "xlsx"], key="arch_pres")
-        pres = adaptar_presupuesto(cargar_archivo(arch_pres), dayfirst) if arch_pres else None
-    else:
-        st.caption("Usando presupuesto de ejemplo.")
-        pres = presupuesto_demo(df)
-
-with st.sidebar.expander("Ventas Complementarios"):
-    arch2 = st.file_uploader(
-        "Sube las ventas de complementarios (CSV/Excel: fecha, producto, ventas, unidad)",
-        type=["csv", "xlsx"], key="arch2")
-    if arch2:
-        dayfirst2 = st.checkbox("Fechas con día primero (dd/mm/aaaa)", value=True,
-                                key="dayfirst2")
-        df2 = preparar(adaptar(cargar_archivo(arch2), prefijo="g2_", ct=st, con_unidad=True),
-                       dayfirst=dayfirst2)
-        if df2.empty:
-            st.error("No quedaron datos válidos en el archivo del grupo 2. "
-                     "Revisa las columnas elegidas o el formato de fecha.")
+    with st.expander("Ventas Complementarios"):
+        arch2 = st.file_uploader(
+            "Sube las ventas de complementarios (CSV/Excel: fecha, producto, ventas, unidad)",
+            type=["csv", "xlsx"], key="arch2")
+        if arch2:
+            dayfirst2 = st.checkbox("Fechas con día primero (dd/mm/aaaa)", value=True,
+                                    key="dayfirst2")
+            df2 = preparar(adaptar(cargar_archivo(arch2), prefijo="g2_", ct=st, con_unidad=True),
+                        dayfirst=dayfirst2)
+            if df2.empty:
+                st.error("No quedaron datos válidos en el archivo del grupo 2. "
+                        "Revisa las columnas elegidas o el formato de fecha.")
+                df2 = None
+        elif not archivo:
+            st.caption("Usando datos de ejemplo.")
+            df2 = preparar(datos_demo(2))
+        else:
             df2 = None
-    elif not archivo:
-        st.caption("Usando datos de ejemplo.")
-        df2 = preparar(datos_demo(2))
-    else:
-        df2 = None
 
-with st.sidebar.expander("Indicadores comerciales (referidos, fidelización, margen, NPS)"):
-    arch_kpi = st.file_uploader(
-        "Sube el archivo (CSV/Excel: mes, año, referidos, fidelización, margen bruto, NPS)",
-        type=["csv", "xlsx"], key="arch_kpi")
-    if arch_kpi:
-        kpi = adaptar_kpis(cargar_archivo(arch_kpi), dayfirst if archivo else True)
-    elif not archivo:
-        st.caption("Usando datos de ejemplo.")
-        kpi = kpis_demo()
-    else:
-        kpi = None
+    with st.expander("Indicadores comerciales (referidos, fidelización, margen, NPS)"):
+        arch_kpi = st.file_uploader(
+            "Sube el archivo (CSV/Excel: mes, año, referidos, fidelización, margen bruto, NPS)",
+            type=["csv", "xlsx"], key="arch_kpi")
+        if arch_kpi:
+            kpi = adaptar_kpis(cargar_archivo(arch_kpi), dayfirst if archivo else True)
+        elif not archivo:
+            st.caption("Usando datos de ejemplo.")
+            kpi = kpis_demo()
+        else:
+            kpi = None
 
 if pres is not None:
     pres["trimestre"] = "T" + ((pres["mes"] - 1) // 3 + 1).astype(str)

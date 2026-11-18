@@ -27,7 +27,7 @@ granularidad = st.sidebar.radio("Segmentar por", ["Mes", "Trimestre", "Semestre"
 if granularidad == "Mes":
     col_periodo = "mes"
     opciones = list(MESES.keys())
-    sel_periodos = st.sidebar.multiselect("Meses", opciones, default=opciones,
+    sel_periodos = st.sidebar.multiselect("Meses", opciones, default=opciones[:10],
                                           format_func=lambda m: MESES[m], key="k_meses")
 elif granularidad == "Trimestre":
     col_periodo = "trimestre"

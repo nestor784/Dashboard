@@ -41,7 +41,7 @@ def render(df, pres, titulo, con_presupuesto=True, por_unidad=False):
     if granularidad == "Mes":
         col_periodo = "mes"
         opciones = list(MESES.keys())
-        sel_periodos = st.sidebar.multiselect("Meses", opciones, default=opciones,
+        sel_periodos = st.sidebar.multiselect("Meses", opciones, default=opciones[:10],
                                               format_func=lambda m: MESES[m])
     elif granularidad == "Trimestre":
         col_periodo = "trimestre"
