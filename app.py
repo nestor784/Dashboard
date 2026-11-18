@@ -36,7 +36,7 @@ with st.sidebar.expander("Presupuesto mensual por producto", expanded=True):
 
 with st.sidebar.expander("Ventas · Grupo 2 (otros 3 productos)"):
     arch2 = st.file_uploader(
-        "Sube las ventas del grupo 2 (CSV/Excel: fecha, producto, ventas, unidad)",
+        "Sube las ventas de complementarios (CSV/Excel: fecha, producto, ventas, unidad)",
         type=["csv", "xlsx"], key="arch2")
     if arch2:
         dayfirst2 = st.checkbox("Fechas con día primero (dd/mm/aaaa)", value=True,
