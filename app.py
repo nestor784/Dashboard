@@ -1,6 +1,7 @@
 import numpy as np
 import streamlit as st
 
+
 from datos import (adaptar, adaptar_kpis, adaptar_presupuesto, cargar_archivo,
                    datos_demo, kpis_demo, preparar, presupuesto_demo)
 
@@ -34,7 +35,7 @@ with st.sidebar.expander("Presupuesto mensual por producto", expanded=True):
         st.caption("Usando presupuesto de ejemplo.")
         pres = presupuesto_demo(df)
 
-with st.sidebar.expander("Ventas · Grupo 2 (otros 3 productos)"):
+with st.sidebar.expander("Ventas Complementarios"):
     arch2 = st.file_uploader(
         "Sube las ventas de complementarios (CSV/Excel: fecha, producto, ventas, unidad)",
         type=["csv", "xlsx"], key="arch2")
