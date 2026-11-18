@@ -7,7 +7,7 @@ from datos import MESES
 
 k = st.session_state["kpi"]
 
-st.title("Indicadores comerciales")
+st.title("Indicadores Comerciales (NPS, Fidelización)")
 
 if k is None:
     st.info("Sube el archivo en la barra lateral, sección «Indicadores comerciales» "
@@ -77,10 +77,10 @@ c1.metric("Referidos (total)", fmt(r1["referidos"], "{:,.0f}"),
           else f"{(r1['referidos'] / r0['referidos'] - 1) * 100:+.1f}% vs {a0}")
 c2.metric("Fidelización (prom.)", fmt(r1["fidelizacion"], "{:.1f}%"),
           delta(r1["fidelizacion"], r0.get("fidelizacion"), "{:+.1f} pp"))
-c3.metric("Margen bruto (prom.)", fmt(r1["margen"], "{:.1f}$"),
-          delta(r1["margen"], r0.get("margen"), "{:+.1f} pp"))
-c4.metric("NPS (prom.)", fmt(r1["nps"], "{:.0f}"),
-          delta(r1["nps"], r0.get("nps"), "{:+.0f} %"))
+c3.metric("Margen bruto (prom.)", fmt(r1["margen"], "{:.1f} $"),
+          delta(r1["margen"], r0.get("margen"), "{:+.1f} pesos"))
+c4.metric("NPS (prom.)", fmt(r1["nps"], "{:.1f}%"),
+          delta(r1["nps"], r0.get("nps"), "{:+.0f} pp"))
 
 # ---------------------------------------------------------------- gráficos
 agg = (f.groupby(["anio", col_periodo], as_index=False)

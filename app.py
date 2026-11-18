@@ -11,12 +11,12 @@ st.set_page_config(page_title="Dashboard de ventas 2025 vs 2026", layout="wide")
 st.sidebar.header("Filtros")
 
 archivo = st.sidebar.file_uploader(
-    "Sube tus datos (CSV/Excel con columnas: fecha, producto, ventas)",
+    "Sube tus datos (CSV/Excel: fecha, producto, ventas y, opcional, transacciones y comb)",
     type=["csv", "xlsx"])
 
 if archivo:
     dayfirst = st.sidebar.checkbox("Fechas con día primero (dd/mm/aaaa)", value=True)
-    df = preparar(adaptar(cargar_archivo(archivo)), dayfirst=dayfirst)
+    df = preparar(adaptar(cargar_archivo(archivo), con_extras=True), dayfirst=dayfirst)
 else:
     df = preparar(datos_demo())
 
@@ -33,6 +33,25 @@ with st.sidebar.expander("Presupuesto mensual por producto", expanded=True):
     else:
         st.caption("Usando presupuesto de ejemplo.")
         pres = presupuesto_demo(df)
+
+with st.sidebar.expander("Ventas · Grupo 2 (otros 3 productos)"):
+    arch2 = st.file_uploader(
+        "Sube las ventas del grupo 2 (CSV/Excel: fecha, producto, ventas, unidad)",
+        type=["csv", "xlsx"], key="arch2")
+    if arch2:
+        dayfirst2 = st.checkbox("Fechas con día primero (dd/mm/aaaa)", value=True,
+                                key="dayfirst2")
+        df2 = preparar(adaptar(cargar_archivo(arch2), prefijo="g2_", ct=st, con_unidad=True),
+                       dayfirst=dayfirst2)
+        if df2.empty:
+            st.error("No quedaron datos válidos en el archivo del grupo 2. "
+                     "Revisa las columnas elegidas o el formato de fecha.")
+            df2 = None
+    elif not archivo:
+        st.caption("Usando datos de ejemplo.")
+        df2 = preparar(datos_demo(2))
+    else:
+        df2 = None
 
 with st.sidebar.expander("Indicadores comerciales (referidos, fidelización, margen, NPS)"):
     arch_kpi = st.file_uploader(
@@ -53,15 +72,18 @@ if pres is not None:
 # Los datos se comparten con las páginas mediante session_state
 st.session_state["df"] = df
 st.session_state["pres"] = pres
+st.session_state["df2"] = df2
 st.session_state["kpi"] = kpi
 
 # ---------------------------------------------------------------- navegación
 navegacion = st.navigation([
-    st.Page("vistas/ventas.py", title="Ventas 2025 vs 2026",
+    st.Page("vistas/ventas.py", title="Ventas Combustible",
             icon=":material/bar_chart:", default=True),
-    st.Page("vistas/indicadores.py", title="Otros indicadores",
+    st.Page("vistas/indicadores.py", title="Otros Indicadores Combustible",
             icon=":material/insights:"),
-    st.Page("vistas/comercial.py", title="Indicadores comerciales",
+    st.Page("vistas/ventas2.py", title="Ventas Complementarios",
+                icon=":material/bar_chart:"),
+    st.Page("vistas/comercial.py", title="Indicadores Comerciales (NPS, Fidelización)",
             icon=":material/groups:"),
 ])
 navegacion.run()
